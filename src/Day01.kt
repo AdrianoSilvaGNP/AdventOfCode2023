@@ -1,6 +1,4 @@
 fun main() {
-
-    // Extract the common logic to a separate function
     fun extractFirstLastDigit(line: String): Int {
         val firstDigit = line.find { it.isDigit() }
         val lastDigit = line.findLast { it.isDigit() }
