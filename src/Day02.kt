@@ -43,9 +43,9 @@ fun main() {
         var powerSum = 0
 
         for (line in input) {
-            var minNecessaryRed = -1
-            var minNecessaryGreen = -1
-            var minNecessaryBlue = -1
+            var minNecessaryRed = 0
+            var minNecessaryGreen = 0
+            var minNecessaryBlue = 0
 
             val subsetStringList = line.substringAfter(":").split(";")
             for (subsetString in subsetStringList) {
