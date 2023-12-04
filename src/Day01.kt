@@ -1,12 +1,30 @@
 fun main() {
+
+    // Extract the common logic to a separate function
+    fun extractFirstLastDigit(line: String): Int {
+        val firstDigit = line.find { it.isDigit() }
+        val lastDigit = line.findLast { it.isDigit() }
+        return "$firstDigit$lastDigit".toInt()
+    }
+
+    val numbersWrittenToNumerical = mapOf(
+        "one" to "1",
+        "two" to "2",
+        "three" to "3",
+        "four" to "4",
+        "five" to "5",
+        "six" to "6",
+        "seven" to "7",
+        "eight" to "8",
+        "nine" to "9"
+    )
+
     fun part1(input: List<String>): Int {
         // get the fist and last number from string
         var sum = 0
 
         for (line in input) {
-            val firstDigit = line.find { it.isDigit() }
-            val lastDigit = line.findLast { it.isDigit() }
-            val number = "$firstDigit$lastDigit".toInt()
+            val number = extractFirstLastDigit(line)
             sum += number
         }
 
@@ -14,18 +32,7 @@ fun main() {
     }
 
     fun part2(input: List<String>): Int {
-        // numbers spelled out in words also count
-        val numbersWrittenToNumerical = mapOf(
-            "one" to "1",
-            "two" to "2",
-            "three" to "3",
-            "four" to "4",
-            "five" to "5",
-            "six" to "6",
-            "seven" to "7",
-            "eight" to "8",
-            "nine" to "9"
-        )
+        // numbers spelled out in words now also count
         var sum = 0
 
         for (line in input) {
@@ -35,7 +42,6 @@ fun main() {
 
             while (i < line.length) {
                 var matched = false
-
                 for ((word, number) in numbersWrittenToNumerical) {
                     if (line.regionMatches(i, word, 0, word.length)) {
                         // if the word is matched, append the number
@@ -50,14 +56,9 @@ fun main() {
                 i++
             }
 
-            // Extract numbers from the transformed string
-            val first = transformedLine.first { it.isDigit() }
-            val last = transformedLine.last { it.isDigit() }
-            val number = "$first$last".toInt()
-
+            val number = extractFirstLastDigit(transformedLine.toString())
             sum += number
         }
-
 
         return sum
     }
