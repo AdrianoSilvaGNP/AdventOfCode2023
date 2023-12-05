@@ -233,28 +233,28 @@ fun main() {
     part2(input).println()
 }
 
-data class SchematicLine(
+private data class SchematicLine(
     val schematicNumbers: List<SchematicNumber>,
     val symbolPositions: List<Int>
 )
 
-data class SchematicNumber(
+private data class SchematicNumber(
     val range: IntRange,
     val value: Int,
 )
 
-data class SchematicLinePart2(
+private class SchematicLinePart2(
     val lineNumber: Int,
     val schematicNumbers: List<SchematicNumber>,
     val symbols: List<SchematicSymbol>
 )
 
-data class SchematicSymbol(
+private class SchematicSymbol(
     val position: Int,
     val isGearSymbol: Boolean = false
 )
 
-data class Gear(
+private class Gear(
     private val adjacentNumbers: MutableList<Int>
 ) {
 
