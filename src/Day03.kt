@@ -4,7 +4,7 @@ fun main() {
 
     // region Part 1
 
-    fun extractSchematicLine(currentLine: String): SchematicLine {
+    fun extractSchematicLinePart1(currentLine: String): SchematicLine {
         // extract numbers and their positions
         val schematicNumbers = mutableListOf<SchematicNumber>()
         val numberResults = numberRegex.findAll(currentLine)
@@ -31,7 +31,7 @@ fun main() {
      * validates if the number indexes of [SchematicNumber]
      * are adjacent to the indexes of [SchematicLine.symbolPositions]
      */
-    fun horizontalLineNumberValidation(schematicLine: SchematicLine, schematicNumber: SchematicNumber): Boolean {
+    fun horizontalLineNumberValidationPart1(schematicLine: SchematicLine, schematicNumber: SchematicNumber): Boolean {
         var isValid = false
         for (symbolPosition in schematicLine.symbolPositions) {
             if (schematicNumber.range.any { it == symbolPosition + 1 || it == symbolPosition - 1 }) {
@@ -46,7 +46,7 @@ fun main() {
      * validates if the number indexes of [SchematicNumber]
      * are contained or adjacent to the indexes of [SchematicLine.symbolPositions]
      */
-    fun verticalLineNumberValidation(schematicLine: SchematicLine, schematicNumber: SchematicNumber): Boolean {
+    fun verticalLineNumberValidationPart1(schematicLine: SchematicLine, schematicNumber: SchematicNumber): Boolean {
         var isValid = false
         for (symbolPosition in schematicLine.symbolPositions) {
             if (schematicNumber.range.any { it == symbolPosition + 1 || it == symbolPosition - 1 }
@@ -67,12 +67,12 @@ fun main() {
             var nextSchematicLine: SchematicLine? = null
 
             // extract all lines
-            val currentSchematicLine = extractSchematicLine(line)
+            val currentSchematicLine = extractSchematicLinePart1(line)
             if (index > 0) {
-                previousSchematicLine = extractSchematicLine(input[index - 1])
+                previousSchematicLine = extractSchematicLinePart1(input[index - 1])
             }
             if (index < input.indices.last) {
-                nextSchematicLine = extractSchematicLine(input[index + 1])
+                nextSchematicLine = extractSchematicLinePart1(input[index + 1])
             }
 
             for (schematicNumber in currentSchematicLine.schematicNumbers) {
@@ -80,15 +80,15 @@ fun main() {
 
                 // validate through all lines
                 if (previousSchematicLine != null) {
-                    isValid = verticalLineNumberValidation(previousSchematicLine, schematicNumber)
+                    isValid = verticalLineNumberValidationPart1(previousSchematicLine, schematicNumber)
                 }
 
                 if (!isValid && currentSchematicLine.symbolPositions.isNotEmpty()) {
-                    isValid = horizontalLineNumberValidation(currentSchematicLine, schematicNumber)
+                    isValid = horizontalLineNumberValidationPart1(currentSchematicLine, schematicNumber)
                 }
 
                 if (!isValid && nextSchematicLine != null) {
-                    isValid = verticalLineNumberValidation(nextSchematicLine, schematicNumber)
+                    isValid = verticalLineNumberValidationPart1(nextSchematicLine, schematicNumber)
                 }
 
                 // if number part valid, add value
@@ -133,10 +133,9 @@ fun main() {
 
     /**
      * validates if the number indexes of [SchematicNumber]
-     * are adjacent to the indexes of [SchematicLinePart2.symbols]
+     * are adjacent any gear symbols
      */
-    fun horizontalLineNumberValidationPart2(schematicLinePart2: SchematicLinePart2, schematicNumber: SchematicNumber): Boolean {
-        var isValid = false
+    fun horizontalLineGearValidation(schematicLinePart2: SchematicLinePart2, schematicNumber: SchematicNumber) {
         for (symbol in schematicLinePart2.symbols) {
             if (schematicNumber.range.any { it == symbol.position + 1 || it == symbol.position - 1 }) {
                 if (symbol.isGearSymbol) {
@@ -150,21 +149,16 @@ fun main() {
                         part2GearsMap[Pair(schematicLinePart2.lineNumber, symbol.position)] =
                             Gear(mutableListOf(schematicNumber.value))
                     }
-                } else {
-                    isValid = true
-                    break
                 }
             }
         }
-        return isValid
     }
 
     /**
      * validates if the number indexes of [SchematicNumber]
-     * are contained or adjacent to the indexes of [SchematicLinePart2.symbols]
+     * are contained or adjacent to any gear symbols
      */
-    fun verticalLineNumberValidationPart2(schematicLinePart2: SchematicLinePart2, schematicNumber: SchematicNumber): Boolean {
-        var isValid = false
+    fun verticalLineGearValidation(schematicLinePart2: SchematicLinePart2, schematicNumber: SchematicNumber) {
         for (symbol in schematicLinePart2.symbols) {
             if (schematicNumber.range.any { it == symbol.position + 1 || it == symbol.position - 1 }
                 || schematicNumber.range.contains(symbol.position)) {
@@ -177,16 +171,13 @@ fun main() {
                         gear.addAdjacentNumber(schematicNumber.value)
                     } else {
                         // put new Gear
-                        part2GearsMap[Pair(schematicLinePart2.lineNumber, symbol.position)] = Gear(mutableListOf(schematicNumber.value))
+                        part2GearsMap[Pair(schematicLinePart2.lineNumber, symbol.position)] =
+                            Gear(mutableListOf(schematicNumber.value))
                     }
 
-                } else {
-                    isValid = true
-                    break
                 }
             }
         }
-        return isValid
     }
 
     fun part2(input: List<String>): Int {
@@ -208,36 +199,25 @@ fun main() {
             }
 
             for (schematicNumber in currentSchematicLine.schematicNumbers) {
-                var isValid = false
-
                 // validate through all lines
                 if (previousSchematicLine != null) {
-                    isValid = verticalLineNumberValidationPart2(previousSchematicLine!!, schematicNumber)
+                    verticalLineGearValidation(previousSchematicLine!!, schematicNumber)
                 }
 
-                if (!isValid && currentSchematicLine.symbols.isNotEmpty()) {
-                    isValid = horizontalLineNumberValidationPart2(currentSchematicLine, schematicNumber)
+                if (currentSchematicLine.symbols.isNotEmpty()) {
+                    horizontalLineGearValidation(currentSchematicLine, schematicNumber)
                 }
 
-                if (!isValid && nextSchematicLine != null) {
-                    isValid = verticalLineNumberValidationPart2(nextSchematicLine!!, schematicNumber)
-                }
-
-                // if number part valid, add value
-                if (isValid) {
-                    // I just needed the Gear ratios! LOL Solved and even more difficult problem...
-                    //partNumberSum += schematicNumber.value
+                if (nextSchematicLine != null) {
+                    verticalLineGearValidation(nextSchematicLine!!, schematicNumber)
                 }
             }
-
-
         }
 
-        for(gear in part2GearsMap.values) {
+        for (gear in part2GearsMap.values) {
             partNumberSum += gear.getCalculatedValue()
         }
 
-        //partNumberSum.println()
         return partNumberSum
     }
 
@@ -253,28 +233,28 @@ fun main() {
     part2(input).println()
 }
 
-class SchematicLine(
+data class SchematicLine(
     val schematicNumbers: List<SchematicNumber>,
     val symbolPositions: List<Int>
 )
 
-class SchematicNumber(
+data class SchematicNumber(
     val range: IntRange,
     val value: Int,
 )
 
-class SchematicLinePart2(
+data class SchematicLinePart2(
     val lineNumber: Int,
     val schematicNumbers: List<SchematicNumber>,
     val symbols: List<SchematicSymbol>
 )
 
-class SchematicSymbol(
+data class SchematicSymbol(
     val position: Int,
     val isGearSymbol: Boolean = false
 )
 
-class Gear(
+data class Gear(
     private val adjacentNumbers: MutableList<Int>
 ) {
 
@@ -282,7 +262,7 @@ class Gear(
         adjacentNumbers.add(number)
     }
 
-    fun getCalculatedValue() : Int {
+    fun getCalculatedValue(): Int {
         return if (adjacentNumbers.size == 2) {
             adjacentNumbers[0] * adjacentNumbers[1]
         } else {
