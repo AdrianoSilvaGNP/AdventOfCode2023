@@ -275,4 +275,3 @@ private data class AlmanacRange(
     val destinationRangeStart: Long,
     val rangeLength: Long
 )
-
